@@ -9,37 +9,62 @@ api_key = os.getenv("API_KEY")
 # Initialize OpenAI client
 client = OpenAI(api_key=api_key)
 
-# Define beginning question and possible follow-ups
-beginning_question = '''What is a piece of technology that you don't like and that you don't feel comfortable using?
-                        It can be a technology for work, school or personal use.'''
+# Define beginning question
+beginning_question = "What is a piece of technology that you don't like and that you don't feel comfortable using? "
 
-following_up_questions = [
-    "What is a piece of technology you dislike and feel uncomfortable using, and what about it makes it difficult for you?",
-    "Did your dislike for this technology develop over time, or did you find it frustrating from the start? What changed or reinforced your feelings?",
-    "How does this technology compare to others that serve a similar purpose, and what aspects make it better or worse?",
-    "What features or elements are missing from this technology that would improve your experience, and how would you design them?",
-    "How do you feel when learning to use new technology, and what factors influence whether the experience is positive or negative for you?",
-    "Can you describe the best technology youve ever used and what made it stand out to you?",
-    "What is the worst technology youve ever used, and what specific challenges made it difficult or frustrating?",
-    "When learning new technology, what methods help you the most, and why do they work well for you?",
-    "What learning experiences have been the most frustrating for you when trying to use new technology, and what would have made them better?",
-    "Do you prefer technology that gradually introduces features over time or one that lets you explore freely? How does this preference impact how you interact with new tools?"
-]
+# Define structured follow-up questions with deeper branching
+followup_groups = {
+    "general_dislike": {
+        "initial": [
+            "What about this technology makes it difficult for you?",
+            "Did your dislike develop over time, or was it frustrating from the start?",
+            "How does this technology compare to alternatives?"
+        ],
+        "reasons": [
+            "Is it due to usability, security, or another factor?",
+            "Do you think the issue is with the design or with how it is implemented?"
+        ],
+        "impact": [
+            "How has this technology affected your work or daily life?",
+            "Have you found any workarounds to make it more bearable?"
+        ]
+    },
+    "improvements": {
+        "features": [
+            "What features would improve your experience?",
+            "If you could redesign this technology, what would you change?"
+        ],
+        "alternatives": [
+            "Are there existing technologies that solve these problems better?",
+            "What elements from other technologies would you incorporate into this one?"
+        ]
+    },
+    "learning_experience": {
+        "methods": [
+            "How do you feel when learning to use new technology?",
+            "What methods help you learn new technology the best?"
+        ],
+        "frustrations": [
+            "What aspects of learning new technology frustrate you the most?",
+            "Have you ever given up on learning a technology due to its complexity?"
+        ],
+        "preferences": [
+            "Do you prefer step-by-step guidance or hands-on experimentation?",
+            "What role does documentation play in your learning process?"
+        ]
+    }
+}
 
-
-def get_best_followup(response_text):
+def determine_followup_category(response_text, previous_question):
+    """Uses AI to determine the most relevant follow-up category based on the response."""
     prompt = (
-        "For context, an interviewer is interviewing someone about their problems with technology.\n"
-        f"The interviewer asked: '{beginning_question}'\n"
+        "An interviewer is asking about someone's experience with technology. "
+        f"The previous question was: '{previous_question}'\n"
         f"The interviewee responded: '{response_text}'\n"
-        "Here are three possible follow-up questions:\n"
-        f"1. {following_up_questions[0]}\n"
-        f"2. {following_up_questions[1]}\n"
-        f"3. {following_up_questions[2]}\n"
-        "Based on the response, which question would be the best follow-up? "
-        "Just return the best follow-up question as plain text."
+        "Which category of follow-up questions is most relevant: general_dislike, improvements, or learning_experience? "
+        "Just return the category name as plain text."
     )
-
+    
     try:
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -49,13 +74,45 @@ def get_best_followup(response_text):
             ],
             temperature=0.5
         )
-
-        best_question = response.choices[0].message.content.strip()
-        return best_question
+        category = response.choices[0].message.content.strip()
+        return category if category in followup_groups else "general_dislike"
     except Exception as e:
         print("API Request failed:", e)
-        return None
+        return "general_dislike"
+
+def get_best_followup(response_text, previous_question):
+    """Selects the best follow-up question from the chosen category."""
+    category = determine_followup_category(response_text, previous_question)
+    subcategories = list(followup_groups[category].keys())
+    
+    prompt = (
+        "Based on the following response, select the best follow-up question.\n"
+        f"Response: '{response_text}'\n"
+        "Possible follow-up questions:\n"
+        + "\n".join([f"- {q}" for subcat in subcategories for q in followup_groups[category][subcat]]) + "\n"
+        "Just return the best follow-up question as plain text."
+    )
+    
+    try:
+        response = client.chat.completions.create(
+            model= "gpt-4o-mini",
+            #model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.5
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print("API Request failed:", e)
+        return followup_groups[category][subcategories[0]][0]
 
 if __name__ == "__main__":
-    response_text = "I love painting landscapes."
-    best_followup = get_best_followup(response_text)
+    previous_question = beginning_question
+    #response_text_1 = "I struggle with using touch-screen keyboards efficiently."
+    response_text_2 = "The online gradebook system I use as a teacher is difficult to use at it is very buggy and overall confusing."
+    best_followup = get_best_followup(response_text_2, previous_question)
+    print("Follow-up question:", best_followup)
+
+

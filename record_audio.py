@@ -61,6 +61,10 @@ def wait_for_enter():
     global is_recording
     input()  # Wait for Enter key
     is_recording = False
+    
+def reset_recording():
+    global is_recording
+    is_recording = True
 
 if __name__ == "__main__":
     filename = "output.wav"
