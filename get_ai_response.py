@@ -52,8 +52,64 @@ followup_groups = {
             "Do you prefer step-by-step guidance or hands-on experimentation?",
             "What role does documentation play in your learning process?"
         ]
+    },
+    "goals": {
+        "functional_goals": [
+            "What do you hope to be able to accomplish?",
+            "What's not working, if anything?"
+        ],
+        "formal_goals": [
+            "What form should the solution take? Option? Setting? Control?",
+            "What needs to exist that doesn't currently exist?"
+        ],
+        "economic_goals": [
+            "What would they spend?",
+            "How much is this worth?"
+        ],
+        "time_based_goals": [
+            "Is there something that takes too much time?",
+            "Is there something that happens too quickly or with not enough steps?"
+        ]
+    },
+    "facts": {
+        "functional_facts": [
+            "What's there now?",
+            "What solutions exist that might apply?"
+        ],
+        "formal_facts": [
+            "What form does it currently take?",
+            "What are the possibilities?"
+        ],
+        "economic_facts": [
+            "What's the current cost?",
+            "What are the current expenses?"
+        ],
+        "time_based_facts": [
+            "How long does it take now?",
+            "When does it happen?",
+            "What are the factors that determine how long it takes?"
+        ]
+    },
+    "concepts": {
+        "functional_concepts": [
+            "How do they think it should work?",
+            "What solutions should be implemented?"
+        ],
+        "formal_concepts": [
+            "What do they think it should look like?",
+            "Where should the solution live?"
+        ],
+        "economic_concepts": [
+            "How much do they think it should cost?",
+            "How do they perceive the value?"
+        ],
+        "time_based_concepts": [
+            "How much time should it take?",
+            "When should it happen?"
+        ]
     }
 }
+
 
 def determine_followup_category(response_text, previous_question):
     """Uses AI to determine the most relevant follow-up category based on the response."""
