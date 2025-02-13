@@ -1,2 +1,82 @@
 # ai-interview-assistent
-Python script which leverages OpenAI and Google's speech recognition AI's to listen and feed the best follow up question based on a response during an interview 
+The tool I built to assist with my interview was a python script which records a response from a question I, the interviewer, ask and based on the transcribed response and context of the previous question provides the most relevant follow up question. This follow up question is determined based on a branching tree of categories and subcategories leading to specific questions, which were created with fleshing out this project's Problem Statement in mind. The goal of this tool is to allow myself to be fully engaged and participating in the interview in order to get the best responses from the interviewee, while I allow an AI assistant to parse through pre-prepared potential follow up questions. Ideally this tool works in such a manner that I engage with a single question and that question's response at time, prodding at small details in the response for clarification, while the mental labor, awkwardness, and distraction of looking through a script for pre-prepared questions is passed off to an assistant. 
+
+I utilized OpenAI’s chat-gpt-4o-mini model via an API to suggest the follow up question based on a given response and list of pre-prepared questions, as well as Google's transcription found through the Python Speech Recognition library. 
+
+
+## Questions
+See the file [get_ai_response.py](get_ai_response.py) to get an exact look at the logic and tree structure of this tool. Below is the opening question and follow-up tree in bulleted format.
+
+Opening Question
+* "What is a piece of technology that you use in your daily life don't like and that you don't feel comfortable using? This piece of technology can be used in your personal life, work, etc."
+
+Follow-up Tree: 
+* "general_dislike"
+    * "initial"
+        * "What about this technology makes it difficult for you?"
+        * "Did your dislike develop over time, or was it frustrating from the start?"
+        * "How does this technology compare to alternatives?"
+    * "reasons"
+        *"Is it due to usability, security, or another factor?"
+        * "Do you think the issue is with the design or with how it is implemented?"
+    * "impact"
+        * "How has this technology affected your work or daily life?"
+        * "Have you found any workarounds to make it more bearable?"
+* "improvements"
+    * "features"
+        * "What features would improve your experience?"
+        * "If you could redesign this technology, what would you change?"
+    * "alternatives"
+        * "Are there existing technologies that solve these problems better?"
+        * "What elements from other technologies would you incorporate into this one?"
+* "learning_experience"
+    * "methods"
+        * "How do you feel when learning to use new technology?"
+        * "What methods help you learn new technology the best?"
+    * "frustrations"
+        * "What aspects of learning new technology frustrate you the most?"
+        * "Have you ever given up on learning a technology due to its complexity?"
+    
+    * "preferences"
+        * "Do you prefer step-by-step guidance or hands-on experimentation?"
+        * "What role does documentation play in your learning process?"
+* "goals"
+    * "functional_goals"
+        * "What do you hope to be able to accomplish?"
+        * "What's not working, if anything?"
+    * "formal_goals"
+        * "What form should the solution take? Option? Setting? Control?"
+        * "What needs to exist that doesn't currently exist?"
+    * "economic_goals": 
+        * "What would they spend?"
+        * "How much is this worth?"
+    * "time_based_goals"
+        * "Is there something that takes too much time?"
+        * "Is there something that happens too quickly or with not enough steps?"
+* "facts"
+    * "functional_facts"
+        * "What's there now?"
+        * What solutions exist that might apply?"
+    * "formal_facts"
+        * "What form does it currently take?"
+        * "What are the possibilities?"
+    * "economic_facts"
+        * "What's the current cost?",
+        * "What are the current expenses?"
+    * "time_based_facts"
+        * "How long does it take now?"
+        * "When does it happen?"
+        * "What are the factors that determine how long it takes?"
+* "concepts"
+    * "functional_concepts"
+        * "How do they think it should work?"
+        * "What solutions should be implemented?"
+    * "formal_concepts"
+        * "What do they think it should look like?"
+        * "Where should the solution live?"
+    * "economic_concepts"
+        * "How much do they think it should cost?"
+        * "How do they perceive the value?"
+    * "time_based_concepts"
+        * "How much time should it take?"
+        8 "When should it happen?"
